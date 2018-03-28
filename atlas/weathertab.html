@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Weather Report</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="./css/weathertab.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="./css/weather-icons.min.css">
+	<link rel="stylesheet" href="./css/weather-icons.css">
+	<link rel="stylesheet" href="./css/weather-icons-wind.css">
+	<link rel="stylesheet" href="./css/select-css.css">
+	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body class="body">
+	<div class="body_over">
+	</div>
+	<div class="container cont" style="width: 95%; margin-left:auto;margin-right: auto;">
+		<div class="custom-select select_drop">
+			<select id = "city_drop">
+			  <option value="Pune, India">Pune, India</option>
+			  <option value="Mumbai, India">Mumbai, India</option>
+			  <option value="Delhi, India">Delhi, India</option>
+			  <option value="Hyderabad, India">Hyderabad, India</option>
+			  <option value="Ahmedabad, India">Ahmedabad, India</option>
+			  <option value="Lucknow, India">Lucknow, India</option>
+			  <option value="Berlin, Germany">Berlin, Germany</option>
+			</select>
+		</div>
+		
+		<div class="innerwrap">
+			<h1 id = "city-name"></h1>
+			<h3 id = "date_time"></h3>
+			<br>
+			<span class="" id ="icon-glyph" style="font-size: 100px; margin-top:50px"> | <span id="temperature" style="font-family: 'Comic Sans MS', cursive, sans-serif"> </span></span> <br> <br>
+			<span id="condition" style="font-family: 'Comic Sans MS', cursive, sans-serif;font-size: 40px;margin:55px"></span>
+			<div id="demo"></div>
+			<footer>
+				<table id ="ul_list">
+					<tr>
+						<th class="list_element">Wind </th>
+						<th class="list_element">Atmosphere </th>
+						<th class="list_element">Astronomy</th>
+					</tr>
+					<tr>
+						<td style="text-align: center;" id="Wind"></td>
+						<td style="text-align: center;" id="Atmosphere"></td>
+						<td style="text-align: center;" id="Astronomy"></td>
+					</tr>
+				</table>
+			</footer>
+		</div>
+	</div>
+	<script>
+	var city_name = "Pune, India";
+	function addDOM (city_name) {
+		$.get("https://query.yahooapis.com/v1/public/yql?q=select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='"+city_name+"')&format=json", function(data, status){
+			var data_used = data.query.results.channel;
+			console.log(data_used);
+			$('#city-name').text(data_used.location.city);
+			$('#temperature').text(data_used.item.condition.temp + " F");
+			$('#condition').text(data_used.item.condition.text);
+			$('#date_time').text(data_used.item.condition.date);
+			$('#Wind').html("Chill "+data_used.wind.chill+" F"+"<br />Speed "+data_used.wind.speed +" mph");
+			$('#Atmosphere').html("Humidity " + data_used.atmosphere.humidity+"<br /> Pressure "+ data_used.atmosphere.pressure);
+			$('#Astronomy').html("Sunrise "+data_used.astronomy.sunrise +"<br />Sunset "+ data_used.astronomy.sunset);
+			var class_name = "wi wi-day-sunny";
+			switch (data_used.item.condition.text){
+					case "Sunny":
+						class_name ="wi wi-day-sunny";
+						break;
+					case "Partly Cloudy":
+						class_name = "wi wi-day-cloudy";
+						break;
+					case "Mostly Cloudy":
+						class_name = "wi wi-day-cloudy-high";
+						break;
+					case "Snow Showers":
+						class_name = "wi wi-day-snow";
+						break;
+					case "Rain":
+						class_name = "wi wi-day-rain";
+						break;
+					case "Thunderstorms":
+						class_name = "wi wi-day-thunderstorm";
+						break;
+					case "Cloudy":
+						class_name = "wi wi-day-cloudy-high";
+						break;
+					default:
+						break;
+					}
+			$('#icon-glyph').addClass(class_name);
+		});
+	}
+	addDOM(city_name);
+	$('#city_drop').change(function(){
+		console.log(this.value);
+		addDOM(this.value);
+	})
+	</script>
+</body>
+</html>
